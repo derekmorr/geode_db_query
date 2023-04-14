@@ -29,8 +29,6 @@ def load_events(pool: ConnectionPool, min_lng: float, min_lat: float, max_lng: f
                   sampling_protocol, state_province, year_collected
                 FROM event_metadata 
                 WHERE event_metadata.geom && ST_MakeEnvelope(%s, %s, %s, %s, 4326)
-
- 
                 """,
                (min_lng, min_lat, max_lng, max_lat)
             )

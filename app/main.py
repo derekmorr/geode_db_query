@@ -4,9 +4,18 @@ from typing import List
 
 from db import load_events, load_event_hapstats
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from psycopg_pool import ConnectionPool
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 pool = ConnectionPool()
 
