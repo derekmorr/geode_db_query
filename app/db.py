@@ -26,7 +26,8 @@ def load_events(pool: ConnectionPool, min_lng: float, min_lat: float, max_lng: f
                   maximum_elevation_in_meters, microhabitat,
                   minimum_depth_in_meters, minimum_elevation_in_meters,
                   month_collected, permit_information, principal_investigator,
-                  sampling_protocol, state_province, year_collected
+                  sampling_protocol, state_province, year_collected,
+                  ST_AsGeoJSON(geom) AS geom
                 FROM event_metadata 
                 WHERE event_metadata.geom && ST_MakeEnvelope(%s, %s, %s, %s, 4326)
                 """,
