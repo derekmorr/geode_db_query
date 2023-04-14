@@ -2,9 +2,11 @@
 
 from typing import List
 
-from db import load_events_gj, load_event_hapstats
+from db import load_events, load_event_hapstats
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from psycopg_pool import ConnectionPool
 
 app = FastAPI()
@@ -31,19 +33,18 @@ def close_pool():
 @app.get("/events")
 def events(min_lng: float, min_lat: float, max_lat: float, max_lng: float) -> List:
     """Query the events_metdata table to load events."""
-    events = load_events_gj(pool, min_lng, min_lat, max_lng, max_lat)
-    #events = events[0]['json_build_object']
-    print(f"events = {type(events)}")
-    events = events['result']
-    print(f"after processing, events = {type(events)}")
-
+    features = load_events(pool, min_lng, min_lat, max_lng, max_lat)
+    response = {
+        'type': 'FeatureCollection',
+        'features': features['features']
+    }
 
     # # do this? - do in parallel or avoid n+1?
     # for event in events:
     #     hapstats = load_event_hapstats(pool, event['event_id'])
     #     event['hapstats'] = hapstats
 
-    return(events)
+    return JSONResponse(content=jsonable_encoder(response))
 
 @app.get("/events/hapstats/{event_id}")
 def event_hapstats(event_id: str):
