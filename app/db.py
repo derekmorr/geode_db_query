@@ -38,7 +38,6 @@ def load_events(pool: ConnectionPool, min_lng: float, min_lat: float, max_lng: f
             )
 
             results = cur.fetchone()
-            print(results)
             return results
 
 def load_event_hapstats(pool: ConnectionPool, event_id: str) -> List[Dict[str, Any]]:
