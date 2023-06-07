@@ -4,6 +4,11 @@ import psycopg
 from psycopg.adapt import Loader
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
+
+from models import *
 
 
 class NumericFloatLoader(Loader):
@@ -12,15 +17,22 @@ class NumericFloatLoader(Loader):
         return float(data)
 
 
-def load_events(pool: ConnectionPool, min_lng: float, min_lat: float, max_lng: float, max_lat: float) -> List[Dict[str, Any]]:
-    with pool.connection() as conn:
-        conn.adapters.register_loader("numeric", NumericFloatLoader)
-        with conn.cursor(row_factory=dict_row) as cur:
-            cur.execute(
-                """
-                SELECT json_agg(ST_AsGeoJSON(t.*)::json) AS features
-                FROM (
-                  SELECT 
+def load_events(db: Session, min_lng: float, min_lat: float, max_lng: float, max_lat: float):
+    """Load all events in a bounding box"""
+
+    location_params = {
+        "min_lng": min_lng, 
+        "min_lat": min_lat, 
+        "max_lng": max_lng,
+        "max_lat": max_lat 
+    }
+
+    rs = db.execute(
+        text(
+            """
+            SELECT json_agg(ST_AsGeoJSON(t.*)::json) AS features
+            FROM (
+                SELECT 
                     event_id, continent_ocean, coordinate_uncertainty_in_meters,
                     country, day_collected,
                     environmental_medium, expedition_code, georeference_protocol,
@@ -30,33 +42,43 @@ def load_events(pool: ConnectionPool, min_lng: float, min_lat: float, max_lng: f
                     month_collected, permit_information, principal_investigator,
                     sampling_protocol, state_province, year_collected,
                     geom
-                  FROM event_metadata 
-                  WHERE event_metadata.geom && ST_MakeEnvelope(%s, %s, %s, %s, 4326)
-                ) AS t
-                """,
-               (min_lng, min_lat, max_lng, max_lat)
-            )
-
-            results = cur.fetchone()
-            return results
-
-def load_event_hapstats(pool: ConnectionPool, event_id: str) -> List[Dict[str, Any]]:
-    with pool.connection() as conn:
-        conn.adapters.register_loader("numeric", NumericFloatLoader)
-        with conn.cursor(row_factory=dict_row) as cur:
-            cur.execute(
-                """
-                SELECT *
                 FROM event_metadata 
-                JOIN sample_metadata USING (event_id)
-                JOIN datasets USING (dataset_name)
-                JOIN stacks_runs ON stacks_runs.stacks_run_name = datasets.r80
-                JOIN populations_sumstats_summary_all_positions USING (stacks_run_id)
-                WHERE event_metadata.event_id = %s
-                """,
-                (event_id,)
-            )
-            results = cur.fetchall()
-            return results
+                WHERE event_metadata.geom && ST_MakeEnvelope(:min_lng, :min_lat, :max_lng, :max_lat, 4326)
+            ) AS t
+            """),
+        location_params
+    )
 
+    return rs.fetchall()
 
+# def load_events2(db: Session, phylum: Optional[str], habitat: Optional[str]) -> List[Any]:
+#     stmt = ???
+#     return db.query(stmt).all()
+
+# xxx: tighten return type
+def load_event_hapstats(db: Session, event_id: str):
+#    return db.query(EventMetadata, SampleMetadata, Datasets, StacksRuns, PopulationsSumStatsSummaryAllPositions)\
+#         .select_from(EventMetadata)\
+#         .join(SampleMetadata)\
+#         .join(Datasets)\
+#         .join(StacksRuns, StacksRuns.stacks_run_name == Datasets.r80)\
+#         .join(PopulationsSumStatsSummaryAllPositions)\
+#         .where(EventMetadata.event_id == event_id)\
+#         .all()
+
+    rs = db.execute(``
+        text(
+            """
+            SELECT *
+            FROM event_metadata 
+            JOIN sample_metadata USING (event_id)
+            JOIN datasets USING (dataset_name)
+            JOIN stacks_runs ON stacks_runs.stacks_run_name = datasets.r80
+            JOIN populations_sumstats_summary_all_positions USING (stacks_run_id)
+            WHERE event_metadata.event_id = :event_id
+            """
+        ),
+        { "event_id": event_id }
+    )
+
+    return rs.fetchall()
