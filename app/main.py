@@ -52,12 +52,28 @@ def health():
     except OperationalError:
         raise HTTPException(status_code=500, detail="Error connecting to database")
 
-    
 
 @app.get("/events")
-def events(min_lng: float, min_lat: float, max_lat: float, max_lng: float,  db: Session = Depends(get_db)) -> JSONResponse:
+def events(
+    min_lng: float, min_lat: float, max_lat: float, max_lng: float,
+    phylum: str | None = None,
+    taxonomic_class: str | None = None,
+    taxonomic_order: str | None = None,
+    family: str | None = None,
+    genus: str | None = None, 
+    species: str | None = None,
+    habitat: str | None = None,
+    country: str | None = None,
+    continent_ocean: str | None = None,
+    db: Session = Depends(get_db)) -> JSONResponse:
     """Query the events_metdata table to load events."""
-    features = load_events(db, min_lng, min_lat, max_lng, max_lat)
+    
+    features = load_events(
+        db, 
+        min_lng, min_lat, max_lng, max_lat, 
+        phylum, taxonomic_class, taxonomic_order, family, genus, species, 
+        habitat, country, continent_ocean
+    )
     features = features[0][0]
     response = {
         'type': 'FeatureCollection',

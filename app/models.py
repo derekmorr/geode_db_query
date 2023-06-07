@@ -88,7 +88,7 @@ class SampleMetadata(Base):
     associated_media: Mapped[Optional[str]] = mapped_column(TEXT)
     associated_references: Mapped[Optional[str]] = mapped_column(TEXT)
     biosample_acc_sra: Mapped[str] = mapped_column(TEXT)
-    bio_class: Mapped[Optional[str]] = mapped_column(TEXT, name="class")
+    taxonomic_class: Mapped[Optional[str]] = mapped_column(TEXT, name="class")
     colloquial_name: Mapped[Optional[str]] = mapped_column(TEXT)
     establishment_means: Mapped[Optional[str]] = mapped_column(TEXT)
     family: Mapped[Optional[str]] = mapped_column(TEXT)

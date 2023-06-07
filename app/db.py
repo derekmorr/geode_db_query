@@ -1,23 +1,25 @@
 from typing import Any, Dict, List
 
-import psycopg
-from psycopg.adapt import Loader
-from psycopg.rows import dict_row
-from psycopg_pool import ConnectionPool
-from sqlalchemy import create_engine, select
+
+from sqlalchemy import cast, func, select
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from models import *
 
-
-class NumericFloatLoader(Loader):
-    """Decode PG numeric data into a Python float."""
-    def load(self, data):
-        return float(data)
-
-
-def load_events(db: Session, min_lng: float, min_lat: float, max_lng: float, max_lat: float):
+def load_events(
+    db: Session, 
+    min_lng: float, min_lat: float, max_lng: float, max_lat: float,
+    phylum: Optional[str],
+    taxonomic_class: Optional[str],
+    taxonomic_order: Optional[str],
+    family: Optional[str],
+    genus: Optional[str], 
+    species: Optional[str],
+    habitat: Optional[str],
+    country: Optional[str],
+    continent_ocean: Optional[str]):
     """Load all events in a bounding box"""
 
     location_params = {
@@ -27,35 +29,51 @@ def load_events(db: Session, min_lng: float, min_lat: float, max_lng: float, max
         "max_lat": max_lat 
     }
 
-    rs = db.execute(
-        text(
-            """
-            SELECT json_agg(ST_AsGeoJSON(t.*)::json) AS features
-            FROM (
-                SELECT 
-                    event_id, continent_ocean, coordinate_uncertainty_in_meters,
-                    country, day_collected,
-                    environmental_medium, expedition_code, georeference_protocol,
-                    habitat, land_owner, locality, maximum_depth_in_meters,
-                    maximum_elevation_in_meters, microhabitat,
-                    minimum_depth_in_meters, minimum_elevation_in_meters,
-                    month_collected, permit_information, principal_investigator,
-                    sampling_protocol, state_province, year_collected,
-                    geom
-                FROM event_metadata 
-                WHERE event_metadata.geom && ST_MakeEnvelope(:min_lng, :min_lat, :max_lng, :max_lat, 4326)
-            ) AS t
-            """),
-        location_params
-    )
+    # XXX: convert to use a spatial query
+    features_query = select(EventMetadata)\
+                      .join(SampleMetadata)\
+                      .where(EventMetadata.decimal_latitude.between(min_lat, max_lat))\
+                      .where(EventMetadata.decimal_longitude.between(min_lng, max_lng))
+ 
+    if phylum:
+        features_query = features_query.where(SampleMetadata.phylum == phylum)
+    
+    if taxonomic_class:
+        features_query = features_query.where(SampleMetadata.taxonomic_class == taxonomic_class)
 
-    return rs.fetchall()
+    if taxonomic_order:
+        features = features_query.where(SampleMetadata.taxonomic_order == taxonomic_order)
 
-# def load_events2(db: Session, phylum: Optional[str], habitat: Optional[str]) -> List[Any]:
-#     stmt = ???
-#     return db.query(stmt).all()
+    if family:
+        features_query = features_query.where(SampleMetadata.family == family)
+    
+    if genus:
+        features_query = features_query.where(SampleMetadata.genus == genus)
 
-# xxx: tighten return type
+    if species:
+        features_query = features_query.where(EventMetadata.species == species)
+    
+    if habitat:
+        features_query = features_query.where(EventMetadata.habitat == habitat)
+
+    if country:
+        features_query = features_query.where(EventMetadata.country == country)
+
+    if continent_ocean: 
+        features_query = features_query.where(EventMetadata.continent_ocean == continent_ocean)
+
+    features_subquery = features_query.subquery("features")
+
+    final_query = select(
+        func.json_agg(
+            cast(func.ST_AsGeoJSON(features_subquery), JSON)
+        )
+    ) 
+
+    rs = db.execute(final_query).all()
+    return rs
+
+
 def load_event_hapstats(db: Session, event_id: str):
 #    return db.query(EventMetadata, SampleMetadata, Datasets, StacksRuns, PopulationsSumStatsSummaryAllPositions)\
 #         .select_from(EventMetadata)\
@@ -66,7 +84,7 @@ def load_event_hapstats(db: Session, event_id: str):
 #         .where(EventMetadata.event_id == event_id)\
 #         .all()
 
-    rs = db.execute(``
+    rs = db.execute(
         text(
             """
             SELECT *
