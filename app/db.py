@@ -104,6 +104,24 @@ def load_event_hapstats(db: Session, event_id: str):
 
     return results.fetchall()
 
+def load_event_variant_stats(db: Session, event_id: str):
+    results = db.execute(
+        text(
+            """
+            SELECT *
+            FROM event_metadata 
+            JOIN sample_metadata USING (event_id)
+            JOIN datasets USING (dataset_name)
+            JOIN stacks_runs ON stacks_runs.stacks_run_name = datasets.r80
+            JOIN populations_sumstats_summary_variant_positions USING (stacks_run_id)
+            WHERE event_metadata.event_id = :event_id
+            """
+        ),
+        { "event_id": event_id }
+    )
+
+    return results.fetchall()
+
 
 def unique_phylum(db: Session) -> List[Optional[str]]:
     """List distinct pyhla in the database"""
