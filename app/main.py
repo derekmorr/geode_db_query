@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict, List
 
-from db import load_events, load_event_hapstats
+from db import unique_phylum, unique_class, unique_order, unique_family, unique_genus, unique_species, unique_environmental_medium, unique_establishment_means, year_range, load_events, load_event_hapstats
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
@@ -65,6 +65,10 @@ def events(
     habitat: str | None = None,
     country: str | None = None,
     continent_ocean: str | None = None,
+    environmental_medium: str | None = None,
+    establishment_means: str | None = None,
+    min_year: int | None = None,
+    max_year: int | None = None,
     db: Session = Depends(get_db)) -> JSONResponse:
     """Query the events_metdata table to load events."""
     
@@ -72,7 +76,10 @@ def events(
         db, 
         min_lng, min_lat, max_lng, max_lat, 
         phylum, taxonomic_class, taxonomic_order, family, genus, species, 
-        habitat, country, continent_ocean
+        habitat, country, continent_ocean,
+        environmental_medium,
+        establishment_means,
+        min_year, max_year
     )
     features = features[0][0]
     response = {
@@ -87,6 +94,50 @@ def events(
 def event_hapstats(event_id: str, db: Session = Depends(get_db)):
     hapstats = load_event_hapstats(db, event_id)
     hapstats = [h._asdict() for h in hapstats]
-
-    print(hapstats)
     return(hapstats)
+
+
+@app.get("/phylum")
+def get_phyla(db: Session = Depends(get_db)):
+    """Get unique phyla in the database."""
+    return unique_phylum(db)
+
+@app.get("/taxonomic_class")
+def get_class(db: Session = Depends(get_db)):
+    """Get unique taxonomic classes in the database."""
+    return unique_class(db)
+
+@app.get("/taxonomic_order")
+def get_order(db: Session = Depends(get_db)):
+    """Get unique taxonomic orders in the database."""
+    return unique_order(db)
+
+@app.get("/family")
+def get_family(db: Session = Depends(get_db)):
+    """Get unique taxonomic families in the database."""
+    return unique_family(db)
+
+@app.get("/genus")
+def get_genus(db: Session = Depends(get_db)):
+    """Get unique genera in the database."""
+    return unique_genus(db)
+
+@app.get("/species")
+def get_species(db: Session = Depends(get_db)):
+    """Get unique species in the database."""
+    return unique_species(db)
+
+@app.get("/environmental_medium")
+def get_environmental_medium(db: Session = Depends(get_db)):
+    """Get unique environmental media in the database."""
+    return unique_environmental_medium(db)
+
+@app.get("/establishment_means")
+def get_establishment_means(db: Session = Depends(get_db)):
+    """Get unique establishment means in the database."""
+    return unique_establishment_means(db)
+
+@app.get("/years")
+def get_years(db: Session = Depends(get_db)):
+    """Return the min/max collection years in the database."""
+    return year_range(db)
