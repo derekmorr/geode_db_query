@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict, List
 
-from db import unique_phylum, unique_class, unique_order, unique_family, unique_genus, unique_species, unique_environmental_medium, unique_establishment_means, year_range, load_events, load_event_hapstats, load_event_variant_stats
+from db import unique_phylum, unique_class, unique_order, unique_family, unique_genus, unique_species, unique_habitats, unique_environmental_medium, unique_establishment_means, year_range, load_events, load_event_hapstats, load_event_variant_stats
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
@@ -75,6 +75,27 @@ def events(
     db: Session = Depends(get_db)) -> JSONResponse:
     """Query the events_metdata table to load events."""
     
+    if phylum:
+        phylum = phylum.split(',')
+    if taxonomic_class:
+        taxonomic_class = taxonomic_class.split(',')
+    if taxonomic_order:
+        taxonomic_order = taxonomic_order.split(',')
+    if family:
+        family = family.split(',')
+    if genus:
+        genus = genus.split(',')
+    if species:
+        species = species.split(',')
+    if country:
+        country = country.split(',')
+    if continent_ocean:
+        continent_ocean = continent_ocean.split(',')
+    if environmental_medium:
+        environmental_medium = environmental_medium.split(',')
+    if establishment_means:
+        establishment_means = establishment_means.split(',')
+
     features = load_events(
         db, 
         min_lng, min_lat, max_lng, max_lat, 
@@ -151,3 +172,8 @@ def get_establishment_means(db: Session = Depends(get_db)):
 def get_years(db: Session = Depends(get_db)):
     """Return the min/max collection years in the database."""
     return year_range(db)
+
+@app.get("/habitat")
+def get_habitats(db: Session = Depends(get_db)):
+    """Return the min/max collection years in the database."""
+    return unique_habitats(db)
