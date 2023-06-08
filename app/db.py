@@ -13,16 +13,16 @@ def load_events(
     min_lng: Optional[float], min_lat: Optional[float], 
     max_lng: Optional[float], max_lat: Optional[float],
     phylum: Optional[str],
-    taxonomic_class: Optional[str],
-    taxonomic_order: Optional[str],
-    family: Optional[str],
-    genus: Optional[str], 
-    species: Optional[str],
-    habitat: Optional[str],
-    country: Optional[str],
-    continent_ocean: Optional[str],
-    environmental_medium: Optional[str],
-    establishment_means: Optional[str],
+    taxonomic_class: Optional[List[str]],
+    taxonomic_order: Optional[List[str]],
+    family: Optional[List[str]],
+    genus: Optional[List[str]], 
+    species: Optional[List[str]],
+    habitat: Optional[List[str]],
+    country: Optional[List[str]],
+    continent_ocean: Optional[List[str]],
+    environmental_medium: Optional[List[str]],
+    establishment_means: Optional[List[str]],
     min_year: Optional[int],
     max_year: Optional[int]):
     """Load all events in a bounding box"""
@@ -36,37 +36,37 @@ def load_events(
                           .where(EventMetadata.decimal_longitude.between(min_lng, max_lng))
 
     if phylum:
-        features_query = features_query.where(SampleMetadata.phylum == phylum)
+        features_query = features_query.where(SampleMetadata.phylum.in_(phylum))
     
     if taxonomic_class:
-        features_query = features_query.where(SampleMetadata.taxonomic_class == taxonomic_class)
+        features_query = features_query.where(SampleMetadata.taxonomic_class.in_(taxonomic_class))
 
     if taxonomic_order:
-        features = features_query.where(SampleMetadata.taxonomic_order == taxonomic_order)
+        features = features_query.where(SampleMetadata.taxonomic_order.in_(taxonomic_order))
 
     if family:
-        features_query = features_query.where(SampleMetadata.family == family)
+        features_query = features_query.where(SampleMetadata.family.in_(family))
     
     if genus:
-        features_query = features_query.where(SampleMetadata.genus == genus)
+        features_query = features_query.where(SampleMetadata.genus.in_(genus))
 
     if species:
-        features_query = features_query.where(SampleMetadata.specific_epithet == species)
+        features_query = features_query.where(SampleMetadata.specific_epithet.in_(species))
     
     if habitat:
-        features_query = features_query.where(EventMetadata.habitat == habitat)
+        features_query = features_query.where(EventMetadata.habitat.in_(habitat))
 
     if country:
-        features_query = features_query.where(EventMetadata.country == country)
+        features_query = features_query.where(EventMetadata.country.in_(country))
 
     if continent_ocean: 
-        features_query = features_query.where(EventMetadata.continent_ocean == continent_ocean)
+        features_query = features_query.where(EventMetadata.continent_ocean.in_(continent_ocean))
 
     if environmental_medium:
-        features_query = features_query.where(EventMetadata.environmental_medium == environmental_medium)
+        features_query = features_query.where(EventMetadata.environmental_medium.in_(environmental_medium))
 
     if establishment_means:
-        features_query = features_query.where(SampleMetadata.establishment_means == establishment_means)
+        features_query = features_query.where(SampleMetadata.establishment_means.in_(establishment_means))
 
     if min_year:
         features_query = features_query.where(EventMetadata.year_collected >= min_year)
@@ -178,6 +178,13 @@ def unique_establishment_means(db: Session) -> List[Optional[str]]:
                 .distinct()\
                 .all()
     return [m[0] for m in means]
+
+def unique_habitats(db: Session) -> List[Optional[str]]:
+    """List distinct habitats in the database."""
+    habitats = db.query(EventMetadata.habitat)\
+                .distinct()\
+                .all()
+    return [h[0] for h in habitats]
 
 def year_range(db: Session) -> Dict[str, int]:
     """Return dictionary of min, max collection years in the database."""
