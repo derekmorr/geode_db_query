@@ -55,7 +55,10 @@ def health():
 
 @app.get("/events")
 def events(
-    min_lng: float, min_lat: float, max_lat: float, max_lng: float,
+    min_lng: float | None = None, 
+    min_lat: float | None = None,
+    max_lat: float | None = None, 
+    max_lng: float | None = None,
     phylum: str | None = None,
     taxonomic_class: str | None = None,
     taxonomic_order: str | None = None,
