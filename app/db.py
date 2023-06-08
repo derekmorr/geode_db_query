@@ -55,7 +55,7 @@ def load_events(
         features_query = features_query.where(SampleMetadata.genus == genus)
 
     if species:
-        features_query = features_query.where(EventMetadata.species == species)
+        features_query = features_query.where(SampleMetadata.specific_epithet == species)
     
     if habitat:
         features_query = features_query.where(EventMetadata.habitat == habitat)
