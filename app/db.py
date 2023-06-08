@@ -10,7 +10,8 @@ from models import *
 
 def load_events(
     db: Session, 
-    min_lng: float, min_lat: float, max_lng: float, max_lat: float,
+    min_lng: Optional[float], min_lat: Optional[float], 
+    max_lng: Optional[float], max_lat: Optional[float],
     phylum: Optional[str],
     taxonomic_class: Optional[str],
     taxonomic_order: Optional[str],
@@ -26,19 +27,14 @@ def load_events(
     max_year: Optional[int]):
     """Load all events in a bounding box"""
 
-    location_params = {
-        "min_lng": min_lng, 
-        "min_lat": min_lat, 
-        "max_lng": max_lng,
-        "max_lat": max_lat 
-    }
+    features_query = select(EventMetadata).join(SampleMetadata)
 
     # XXX: convert to use a spatial query
-    features_query = select(EventMetadata)\
-                      .join(SampleMetadata)\
-                      .where(EventMetadata.decimal_latitude.between(min_lat, max_lat))\
-                      .where(EventMetadata.decimal_longitude.between(min_lng, max_lng))
- 
+    if min_lng and max_lng and min_lat and max_lat:
+        features_query = features_query\
+                          .where(EventMetadata.decimal_latitude.between(min_lat, max_lat))\
+                          .where(EventMetadata.decimal_longitude.between(min_lng, max_lng))
+
     if phylum:
         features_query = features_query.where(SampleMetadata.phylum == phylum)
     

@@ -77,7 +77,6 @@ class EventMetadata(Base):
     state_province: Mapped[Optional[str]] = mapped_column(TEXT)
     year_collected: Mapped[int]
     geom = Column(Geometry('POINT'))
-    # geom GEOMETRY(point, 4326)
 
 class SampleMetadata(Base):
     __tablename__ = "sample_metadata"
