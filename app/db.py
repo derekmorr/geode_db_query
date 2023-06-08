@@ -27,7 +27,7 @@ def load_events(
     max_year: Optional[int]):
     """Load all events in a bounding box"""
 
-    features_query = select(EventMetadata).join(SampleMetadata)
+    features_query = select(EventMetadata, SampleMetadata).join(SampleMetadata)
 
     # XXX: convert to use a spatial query
     if min_lng and max_lng and min_lat and max_lat:
