@@ -26,7 +26,7 @@ call a helper function in `db.py` and does some mimimal post-processing of the r
 
 # Geode REST API Deployment
 
-Currently
+Currently we don't use a CI pipeline to build the image. There are so few changes we just do it manually.
 
 1) Install the [Azure CLI tools](https://learn.microsoft.com/en-us/cli/azure/).
 
@@ -42,4 +42,22 @@ to select the version for the right type of chip (Intel vs M1).
 
 5) Edit the code as desired.
 
-6) Package the code as a Docekr iamge. 
+6) Package the code as a Docker iamge. 
+
+```shell
+export VERSION=xxx
+docker build -t geode:$VERSION -f Dockerfile --platform linux/amd64 .
+docker tag geode:$VERSION geojsonapi.azurecr.io/geode:$VERSION
+docker push geojsonapi.azurecr.io/geode:$VERSION
+```
+
+# Deployment in Azure
+
+Go to [The Azure App Service portal Deployment Center]https://portal.azure.com/#@PennStateOffice365.onmicrosoft.com/resource/subscriptions/24decb73-2fb6-4f80-886d-c6f1da007adb/resourceGroups/geojson-api/providers/Microsoft.Web/sites/geode-geojson-api/vstscd)
+
+
+Under Tag, select the version you want to deploy (the version you built above). Do not change any other settings. Click Save.
+
+Click to the Overview tab. The click the Restart icon. When prommpted if you want to restart the app, click Yes.
+
+
