@@ -73,7 +73,12 @@ def events(
     min_year: int | None = None,
     max_year: int | None = None,
     db: Session = Depends(get_db)) -> JSONResponse:
-    """Query the events_metdata table to load events."""
+    """
+    Query the events_metdata table to load events.
+    
+    Many of the string parameters can be comma-delimited.
+    The function splits them to handle multiple inputs.
+    """
     
     if phylum:
         phylum = phylum.split(',')
@@ -122,7 +127,7 @@ def event_hapstats(event_id: str, db: Session = Depends(get_db)):
 
 
 @app.get("/events/{event_id}/variant_stats")
-def event_hapstats(event_id: str, db: Session = Depends(get_db)):
+def event_variant_stats(event_id: str, db: Session = Depends(get_db)):
     hapstats = load_event_variant_stats(db, event_id)
     hapstats = [h._asdict() for h in hapstats]
     return(hapstats)
