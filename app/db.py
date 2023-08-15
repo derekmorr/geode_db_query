@@ -86,7 +86,7 @@ def load_events(
     return rs
 
 
-def load_event_hapstats(db: Session, event_id: str):
+def load_event_all_stats(db: Session, event_id: str):
     results = db.execute(
         text(
             """

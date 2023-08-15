@@ -125,53 +125,53 @@ class StacksRunsDerivedData(Base):
     filename: Mapped[str] = mapped_column(TEXT)
     file_type: Mapped[str] = mapped_column(TEXT)
 
-class PopulationHapstats(Base):
-    __tablename__ = "population_hapstats"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    stacks_run_id: Mapped[int] = mapped_column(ForeignKey("stacks_runs.stacks_run_id"))
-    locus_id: Mapped[int]
-    chr: Mapped[str] = mapped_column(TEXT)
-    bp: Mapped[int]
-    pop_id: Mapped[str] = mapped_column(TEXT)
-    n_inds: Mapped[int]
-    haplotype_cnt: Mapped[int]
-    gene_diversity: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_gene_diversity: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_gene_diversity_p_value: Mapped[float] = mapped_column(NUMERIC)
-    haplotype_diversity: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_haplotype_diversity: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_haplotype_diversity_p_value: Mapped[float] = mapped_column(NUMERIC)
-    hwe_p_value: Mapped[float] = mapped_column(NUMERIC)
-    hwe_p_value_se: Mapped[float] = mapped_column(NUMERIC)
-    haplotypes: Mapped[str] = mapped_column(TEXT)
-
-class PopulationsSumStats(Base):
-    __tablename__ = "populations_sumstats"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    stacks_run_id: Mapped[int] = mapped_column(ForeignKey("stacks_runs.stacks_run_id"))
-    locus_id: Mapped[int]
-    chr: Mapped[str] = mapped_column(TEXT)
-    bp: Mapped[int]
-    col: Mapped[int]
-    pop_id: Mapped[str] = mapped_column(TEXT)
-    p_nuc: Mapped[str] = mapped_column(String(1).with_variant(CHAR(1), "postgresql"))
-    q_nuc: Mapped[str] = mapped_column(String(1).with_variant(CHAR(1), "postgresql"))
-    n_inds: Mapped[int]
-    p_freq: Mapped[float] = mapped_column(NUMERIC)
-    obs_het: Mapped[float] = mapped_column(NUMERIC)
-    obs_hom: Mapped[float] = mapped_column(NUMERIC)
-    exp_het: Mapped[float] = mapped_column(NUMERIC)
-    exp_hom: Mapped[float] = mapped_column(NUMERIC)
-    pi: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_pi: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_pi_p_value: Mapped[float] = mapped_column(NUMERIC)
-    fis: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_fis: Mapped[float] = mapped_column(NUMERIC)
-    smoothed_fis_p_value: Mapped[float] = mapped_column(NUMERIC)
-    hwe_p_value: Mapped[float] = mapped_column(NUMERIC)
-    private: Mapped[float] = mapped_column(NUMERIC)
+# class PopulationHapstats(Base):
+#     __tablename__ = "population_hapstats"
+# 
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     stacks_run_id: Mapped[int] = mapped_column(ForeignKey("stacks_runs.stacks_run_id"))
+#     locus_id: Mapped[int]
+#     chr: Mapped[str] = mapped_column(TEXT)
+#     bp: Mapped[int]
+#     pop_id: Mapped[str] = mapped_column(TEXT)
+#     n_inds: Mapped[int]
+#     haplotype_cnt: Mapped[int]
+#     gene_diversity: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_gene_diversity: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_gene_diversity_p_value: Mapped[float] = mapped_column(NUMERIC)
+#     haplotype_diversity: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_haplotype_diversity: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_haplotype_diversity_p_value: Mapped[float] = mapped_column(NUMERIC)
+#     hwe_p_value: Mapped[float] = mapped_column(NUMERIC)
+#     hwe_p_value_se: Mapped[float] = mapped_column(NUMERIC)
+#     haplotypes: Mapped[str] = mapped_column(TEXT)
+# 
+# class PopulationsSumStats(Base):
+#     __tablename__ = "populations_sumstats"
+# 
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     stacks_run_id: Mapped[int] = mapped_column(ForeignKey("stacks_runs.stacks_run_id"))
+#     locus_id: Mapped[int]
+#     chr: Mapped[str] = mapped_column(TEXT)
+#     bp: Mapped[int]
+#     col: Mapped[int]
+#     pop_id: Mapped[str] = mapped_column(TEXT)
+#     p_nuc: Mapped[str] = mapped_column(String(1).with_variant(CHAR(1), "postgresql"))
+#     q_nuc: Mapped[str] = mapped_column(String(1).with_variant(CHAR(1), "postgresql"))
+#     n_inds: Mapped[int]
+#     p_freq: Mapped[float] = mapped_column(NUMERIC)
+#     obs_het: Mapped[float] = mapped_column(NUMERIC)
+#     obs_hom: Mapped[float] = mapped_column(NUMERIC)
+#     exp_het: Mapped[float] = mapped_column(NUMERIC)
+#     exp_hom: Mapped[float] = mapped_column(NUMERIC)
+#     pi: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_pi: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_pi_p_value: Mapped[float] = mapped_column(NUMERIC)
+#     fis: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_fis: Mapped[float] = mapped_column(NUMERIC)
+#     smoothed_fis_p_value: Mapped[float] = mapped_column(NUMERIC)
+#     hwe_p_value: Mapped[float] = mapped_column(NUMERIC)
+#     private: Mapped[float] = mapped_column(NUMERIC)
 
 class PopulationsSumStatsSummaryVariantPositions(Base):
     __tablename__ = "populations_sumstats_summary_variant_positions"

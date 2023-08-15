@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict, List
 
-from db import unique_phylum, unique_class, unique_order, unique_family, unique_genus, unique_species, unique_habitats, unique_environmental_medium, unique_establishment_means, year_range, load_events, load_event_hapstats, load_event_variant_stats
+from db import unique_phylum, unique_class, unique_order, unique_family, unique_genus, unique_species, unique_habitats, unique_environmental_medium, unique_establishment_means, year_range, load_events, load_event_all_stats, load_event_variant_stats
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
@@ -119,18 +119,18 @@ def events(
     return JSONResponse(content=jsonable_encoder(response))
 
 
-@app.get("/events/{event_id}/hapstats")
-def event_hapstats(event_id: str, db: Session = Depends(get_db)):
-    hapstats = load_event_hapstats(db, event_id)
-    hapstats = [h._asdict() for h in hapstats]
-    return(hapstats)
+@app.get("/events/{event_id}/all_stats")
+def event_all_stats(event_id: str, db: Session = Depends(get_db)):
+    all_stats = load_event_all_stats(db, event_id)
+    all_stats = [h._asdict() for h in all_stats]
+    return(all_stats)
 
 
 @app.get("/events/{event_id}/variant_stats")
 def event_variant_stats(event_id: str, db: Session = Depends(get_db)):
-    hapstats = load_event_variant_stats(db, event_id)
-    hapstats = [h._asdict() for h in hapstats]
-    return(hapstats)
+    variant_stats = load_event_variant_stats(db, event_id)
+    variant_stats = [h._asdict() for h in variant_stats]
+    return(variant_stats)
 
 
 @app.get("/phylum")
