@@ -10,7 +10,7 @@ Then activate the virtual environemnt:
 
 And install the dependencies:
 
-`pip3 install -r requirements`
+`pip3 install -r requirements.txt`
 
 # Overview
 
