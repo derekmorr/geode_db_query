@@ -94,7 +94,7 @@ def load_event_all_stats(db: Session, event_id: str):
             FROM event_metadata 
             JOIN sample_metadata USING (event_id)
             JOIN datasets USING (dataset_name)
-            JOIN stacks_runs ON stacks_runs.stacks_run_name = datasets.r80
+            JOIN stacks_runs ON (stacks_runs.stacks_run_name = datasets.r80 AND stacks_runs.dataset_name = datasets.dataset_name)
             JOIN populations_sumstats_summary_all_positions USING (stacks_run_id)
             WHERE event_metadata.event_id = :event_id
             """
