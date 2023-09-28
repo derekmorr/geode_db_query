@@ -60,6 +60,6 @@ Go to [The Azure App Service portal Deployment Center](https://portal.azure.com/
 
 Under Tag, select the version you want to deploy (the version you built above). Do not change any other settings. Click Save.
 
-Click to the Overview tab. The click the Restart icon. When prommpted if you want to restart the app, click Yes.
+Click to the Overview tab. The click the Restart icon. When prompted if you want to restart the app, click Yes.
 
 
